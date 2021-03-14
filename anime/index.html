@@ -40,7 +40,7 @@
             overflow: hidden;
         }
 
-        // Basic styling and centering
+      
         .range__wrapper {
             position: absolute;
             left: 50%;
@@ -51,46 +51,43 @@
             background-color: white;
             border-radius: 20px;
             box-shadow: 0 0 100px rgba(0, 0, 0, 0.2);
-            user-select: none; // disable user selection, for better drag & drop
+            user-select: none; 
             cursor: pointer;
             overflow: hidden;
         }
 
-        // Hide the `input`
+       
         .range__input {
             display: none;
         }
 
-        // Position the SVG root element
+      
         .range__slider {
             position: absolute;
             left: 0;
             top: 0;
         }
 
-        // Slider color
+        
         .range__slider__path {
             fill: #212529;
         }
 
-        // Styles for marks
+   
         .range__marks__path {
             fill: none;
             stroke: inherit;
             stroke-width: 1px;
         }
 
-        // Stroke color for the `pink` marks
         .range__marks__pink {
             stroke: #212529;
         }
 
-        // Stroke color for the `white` marks
         .range__marks__white {
             stroke: white;
         }
 
-        // Positioning the container for values, it will be translated with Javascript
         .range__values {
             position: absolute;
             left: 0;
@@ -98,7 +95,6 @@
             width: 100%;
         }
 
-        // Basic styles for the values
 
         .range__value {
             box-sizing: border-box;
@@ -122,24 +118,19 @@
             margin: 0 10px;
         }
 
-        // These `transform-origin` values will keep the numbers in the right position as they are scaled
         .range__value__number--top {
-            transform-origin: 100% 100%; // bottom-right corner
+            transform-origin: 100% 100%;
         }
 
         .range__value__number--bottom {
-            transform-origin: 100% 0; // top-right corner
+            transform-origin: 100% 0; 
         }
 
         .range__value__text {
             display: flex;
             flex-direction: column;
             font-size: 13px;
-            text-transform: uppercase;
-
-            span:first-child {
-                margin-bottom: 3px;
-            }
+            text-transform: uppercase;            
         }
 
         .range__value__text--top {
