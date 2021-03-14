@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "pwa-chrome",            
+            "file": "index.html"
+        },
+
+
+        {
             "command": "git push origin; start https://levshx.github.io/",
             "name": "PUSH & RUN",
             "type": "node-terminal"
