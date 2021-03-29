@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-100">
+<html ng-app="app" lang="en" class="h-100">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,10 +51,10 @@
             </div>
         </header>
 
-        <main ng-app="main" class="px-3">
+        <main class="px-3">
             <div ng-view></div>
             <script>
-                var app = angular.module("main", ["ngRoute"]);
+                var app = angular.module("app", ["ngRoute"]);
                 app.config(function($routeProvider) {
                     $routeProvider
                     .when("/", {
