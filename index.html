@@ -36,14 +36,18 @@
         <header class="mb-auto">
             <div>
                 <h3 class="float-md-start mb-0">levshx</h3>
-                <nav class="nav nav-masthead justify-content-center float-md-end">
-                    <a class="nav-link active" aria-current="page" href="#!">Home</a>
-                    <a class="nav-link" href="#!projects">Projects</a>
-                    <a class="nav-link" href="#!contact">Contact</a>
+                <nav ng-controller="navController" class="nav nav-masthead justify-content-center float-md-end">
+                    <a class="nav-link" ng-class="{active: isActive('#!')}" href="#!">Home</a>
+                    <a class="nav-link" ng-class="{active: isActive('#!projects')}" href="#!projects">Projects</a>
+                    <a class="nav-link" ng-class="{active: isActive('#!contact')}" href="#!contact">Contact</a>
                 </nav>
             </div>
         </header>
 
+        <script>
+        
+        </script>
+        
         <main class="px-3">
             <div ng-view></div>
         </main>
