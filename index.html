@@ -53,21 +53,6 @@
 
         <main class="px-3">
             <div ng-view></div>
-            <script>
-                var app = angular.module("app", ["ngRoute"]);
-                app.config(function($routeProvider) {
-                    $routeProvider
-                    .when("/", {
-                        templateUrl : "pages/main.htm"
-                    })
-                    .when("/projects", {
-                        templateUrl : "pages/projects.htm"
-                    })
-                    .when("/contact", {
-                        templateUrl : "pages/contact.htm"
-                    });
-                });
-            </script>
         </main>
 
         <footer class="mt-auto text-white-50">
