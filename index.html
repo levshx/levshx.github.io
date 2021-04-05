@@ -27,7 +27,9 @@
     <link href="src/css/yo.css" rel="stylesheet">
 
     <!-- JS for this site -->
-    <script src="src/js/routing.js"></script>
+    <script src="src/js/app.js"></script>
+    <script src="src/js/controllers/navController.js"></script>
+    
 </head>
 
 <body class="d-flex h-100 text-center text-white bg-dark">
@@ -36,8 +38,8 @@
         <header class="mb-auto">
             <div>
                 <h3 class="float-md-start mb-0">levshx</h3>
-                <nav class="nav nav-masthead justify-content-center float-md-end">
-                    <a class="nav-link active" href="#!">Home</a>
+                <nav ng-controller="navController" class="nav nav-masthead justify-content-center float-md-end">
+                    <a class="nav-link" href="#!">Home</a>
                     <a class="nav-link" href="#!projects">Projects</a>
                     <a class="nav-link" href="#!contact">Contact</a>
                 </nav>
