@@ -3,5 +3,7 @@ app.controller('navController', ['$scope', '$location', function($scope, $locati
 	$scope.isActive = function(destination){
 		return destination === $location.path();
 	}
+	
+	console.log($location.path());
 
 }]);
