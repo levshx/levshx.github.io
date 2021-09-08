@@ -21,7 +21,7 @@ body {
 }
 
 .cover-container {
-  max-width: 42em;
+  max-width: 65em;
 }
 
 
@@ -64,3 +64,23 @@ body {
                 font-size: 3.5rem;
             }
         }
+
+.photo {
+    display: block;
+    height: 275px;
+    width: 220px;
+    background-color: #999;
+    background-size: 100%;
+    background-image: url(https://sun9-68.userapi.com/impf/c849320/v849320804/a9ca4/DH_4s5p-wMA.jpg?size=640x800&quality=96&sign=096b009425a6e8b401cc7adef9df2c49&type=album);
+}
+
+.skill > div {
+  height: 8px;
+  background-color: #00AF00;
+}
+
+.skill {
+  width: 100%;
+  height: 8px;
+  background-color: #777;
+}
