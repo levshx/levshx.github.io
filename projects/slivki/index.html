@@ -40,7 +40,7 @@
 				scene = new THREE.Scene();
 
 				new RGBELoader()
-					.setPath( 'projects/slivki/textures/' )
+					.setPath( 'textures/' )
 					.load( 'environment.hdr', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -55,7 +55,7 @@
 						// use of RoughnessMipmapper is optional
 						const roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-						const loader = new GLTFLoader().setPath( 'projects/slivki/models/' );
+						const loader = new GLTFLoader().setPath( 'models/' );
 						loader.load( 'slivki.gltf', function ( gltf ) {
 
 							gltf.scene.traverse( function ( child ) {
