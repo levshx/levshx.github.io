@@ -17,12 +17,12 @@
 
 		<script type="module">
 
-			import * as THREE from './js/lib/three.module.js';
+			import * as THREE from '.projects/slivki/js/lib/three.module.js';
 
-			import { OrbitControls } from './js/threejs/controls/OrbitControls.js';
-			import { GLTFLoader } from './js/threejs/loaders/GLTFLoader.js';
-			import { RGBELoader } from './js/threejs/loaders/RGBELoader.js';
-			import { RoughnessMipmapper } from './js/threejs/utils/RoughnessMipmapper.js';
+			import { OrbitControls } from '.projects/slivki/js/threejs/controls/OrbitControls.js';
+			import { GLTFLoader } from '.projects/slivki/js/threejs/loaders/GLTFLoader.js';
+			import { RGBELoader } from '.projects/slivki/js/threejs/loaders/RGBELoader.js';
+			import { RoughnessMipmapper } from '.projects/slivki/js/threejs/utils/RoughnessMipmapper.js';
 
 			let camera, scene, renderer;
 
@@ -40,7 +40,7 @@
 				scene = new THREE.Scene();
 
 				new RGBELoader()
-					.setPath( 'textures/' )
+					.setPath( 'projects/slivki/textures/' )
 					.load( 'environment.hdr', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -55,7 +55,7 @@
 						// use of RoughnessMipmapper is optional
 						const roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-						const loader = new GLTFLoader().setPath( 'models/' );
+						const loader = new GLTFLoader().setPath( 'projects/slivki/models/' );
 						loader.load( 'slivki.gltf', function ( gltf ) {
 
 							gltf.scene.traverse( function ( child ) {
