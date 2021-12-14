@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - glTF 2.0 - transmission</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<div id="info">
+		<a>Elevator configuration</a>
+	</div>
+
+	<script type="module">
+
+		import * as THREE from '/js/lib/three.module.js';
+
+		import { OrbitControls } from '/js/threejs/controls/OrbitControls.js';
+		import { GLTFLoader } from '/js/threejs/loaders/GLTFLoader.js';
+		import { RoomEnvironment } from '/js/threejs/environments/RoomEnvironment.js';
+
+		import { GUI } from '/js/threejs/libs/lil-gui.module.min.js';
+
+		let camera, scene, renderer;
+		var stages_count = 10;
+		var lift, left_door, right_door, stage, lift_do = "stop";
+		var COMPORTs = { 'COM1': 'COM1', 'COM2': 'COM2' };
+
+		init();
+		animate();
+
+		function init() {
+
+			const loader = new GLTFLoader();
+
+			const container = document.createElement('div');
+			document.body.appendChild(container);
+
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 30);
+			camera.position.set(5, 5.1, 10);
+			camera.rotation.set(0, 0.5, 0);
+
+			scene = new THREE.Scene();
+
+			const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
+			scene.add(directionalLight);
+
+			// model
+
+			new GLTFLoader().setPath('models/').load('bot.gltf', function (gltf) {
+
+				var bot = gltf.scene;
+				scene.add(bot);
+
+
+			});
+
+			new GLTFLoader().setPath('models/').load('lift.gltf', function (gltf) {
+
+				lift = gltf.scene;
+				scene.add(lift);
+			});
+
+
+			// for (var floor = 0; floor < 1; floor++) {
+			// 	new GLTFLoader().setPath('models/').load('stage.gltf', function (gltf) {
+
+			// 		stage = gltf.scene;				
+			// 		stage.name = "stagePrefab";
+			// 		scene.add(stage);					
+			// 	});
+			// 	var temp = scene.getObjectByName( "stagePrefab");
+			// 	console.log(temp.toJSON());
+			// }
+
+			
+			loader.load('models/stage.gltf', function (gltf) {
+				for (var floor = 0; floor < 3; floor++){
+					var model = gltf.scene;
+					model.name = "floor_"+floor;
+					model.uuid = null;
+					model.position.y = floor*5.1;
+					scene.add(model);
+				}			
+
+			}, undefined, function (error) {
+
+				console.error(error);
+
+			});
+
+
+
+
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.toneMapping = THREE.ACESFilmicToneMapping;
+			renderer.toneMappingExposure = 1;
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			container.appendChild(renderer.domElement);
+
+			const environment = new RoomEnvironment();
+			const pmremGenerator = new THREE.PMREMGenerator(renderer);
+
+			//scene.background = new THREE.Color(0xbbbbbb);
+			scene.environment = pmremGenerator.fromScene(environment).texture;
+
+			// controls = new OrbitControls(camera, renderer.domElement);
+			// controls.enableDamping = true;
+			// controls.minDistance = 10;
+			// controls.maxDistance = 10;
+			// controls.target.set(0, 0, 0); // x Y z камеры
+			// controls.update();
+
+			window.addEventListener('resize', onWindowResize);
+
+			//console.log(scene.toJSON());
+			createPanel();
+		}
+
+
+		function createPanel() {
+			const gui = new GUI();
+
+			const myObject = {
+				'Enabled': true,
+				'Connect to COM PORT': function () { alert("Not work"); },
+				'Elevator stop': function () { lift_do = "stop"; },
+				'Elevator &#8593;': function () { lift_do = "up"; },
+				'Elevator &#8595;': function () { lift_do = "down"; },
+				myString: 'lil-gui',
+				'Number of Floors': stages_count,
+				'Elevator position': 1,
+				'CAMERA X': 0,
+				'CAMERA Y': 0,
+				'CAMERA Z': 10,
+				'COM PORT': "select"
+			};
+
+			gui.add(myObject, 'COM PORT', COMPORTs);
+			gui.add(myObject, 'Connect to COM PORT');
+
+			gui.add(myObject, 'Enabled');
+			gui.add(myObject, 'Number of Floors', 1, 30, 1).listen().onChange(function (weight) {
+				stages_count = weight;
+			});;
+			gui.add(myObject, 'Elevator position', 1, 30).listen().onChange(function (weight) {
+
+				lift.position.y = weight * 5.1 - 5.1;
+				camera.position.y = weight * 5.1;
+			});;
+			gui.add(myObject, 'CAMERA X', 0, 10).listen().onChange(function (weight) {
+				camera.position.x = weight;
+			});;
+			gui.add(myObject, 'CAMERA Y', 0, 10).listen().onChange(function (weight) {
+				camera.position.y = weight;
+			});;
+			gui.add(myObject, 'CAMERA Z', 0, 10).listen().onChange(function (weight) {
+				camera.position.z = weight;
+			});;
+			gui.add(myObject, 'Elevator stop');
+			gui.add(myObject, 'Elevator &#8593;');
+			gui.add(myObject, 'Elevator &#8595;');
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			//controls.update(); // required if damping enabled
+			switch (lift_do) {
+				case "up":
+					lift.position.y += 0.01;
+					camera.position.y += 0.01;
+					break;
+				case "down":
+					if (lift.position.y > -2.5) {
+						lift.position.y -= 0.01;
+						camera.position.y -= 0.01;
+					}
+
+					break;
+
+				default:
+
+					break;
+			}
+
+			render();
+
+		}
+
+		function render() {
+
+			renderer.render(scene, camera);
+
+		}
+
+	</script>
+
+</body>
+
+</html>
