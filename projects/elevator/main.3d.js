@@ -7,10 +7,10 @@ import { GUI } from './lil-gui.module.min.js';
 let camera, scene, renderer;
 let max_stages = 30;
 var stages_count = 10;
-var lift, left_door, right_door, stages, lift_do = "stop", doors_do = "stop", stage_status=true;
+var lift, left_door, right_door, stages, lift_do = "stop", doors_do = "closed", doors_closed = true, stage_status = true, lift_logic_state = "WAIT";
 var COMPORTs = {};
 var ComboBoxCOM;
-var current_call_stage = 0;
+var stop_stage = 0;
 
 
 
@@ -335,7 +335,7 @@ function updateCallPanel() {
 		}
 	}
 	buttons_panel.append(cancel_out_button);
-	
+
 	// Внутренние
 	let br3 = document.createElement('br');
 	let br4 = document.createElement('br');
@@ -368,9 +368,9 @@ function updateCallPanel() {
 		}
 	}
 	buttons_panel.append(cancel_in_button);
-	open_in_button = document.createElement('button'); 
+	open_in_button = document.createElement('button');
 	open_in_button.innerHTML = "< >";
-	close_in_button = document.createElement('button'); 
+	close_in_button = document.createElement('button');
 	close_in_button.innerHTML = "> <";
 	buttons_panel.append(open_in_button);
 	buttons_panel.append(close_in_button);
@@ -385,7 +385,7 @@ function createPanel() {
 	PanelParams = {
 		'Обновить список COM': function () {
 			//alert("Update"); 
-			COMPORTs = ['COM54', 'COM2'];			
+			COMPORTs = ['COM54', 'COM2'];
 			ComboBoxCOM.destroy()
 			ComboBoxCOM = folderCOMPORT.add(PanelParams, 'COM PORT', COMPORTs);
 		},
@@ -395,7 +395,7 @@ function createPanel() {
 				eel.connectSerial(ComboBoxCOM.getValue());
 			}
 			else {
-				alert("Error: Выберите COM Port.");				
+				alert("Error: Выберите COM Port.");
 			}
 
 		},
@@ -432,8 +432,8 @@ function createPanel() {
 	folderCamera.add(PanelParams, 'CAMERA Z', 0, 10).listen().onChange(function (weight) {
 		camera.position.z = weight;
 	});;
-	
-	
+
+
 	const folderElevatorConfig = gui.addFolder('Конфигурация лифта');
 
 	folderElevatorConfig.add(PanelParams, 'Количество этажей', 2, max_stages, 1).listen().onChange(function (weight) {
@@ -443,7 +443,6 @@ function createPanel() {
 		left_door.position.y = 0;
 		camera.position.y -= lift.position.y;
 		lift.position.y = 0;
-		current_call_stage = 0;
 		lift_do = "stop";
 		doors_do = "closed";
 		left_door.position.x = 0;
@@ -485,96 +484,269 @@ function animate() {
 
 	requestAnimationFrame(animate);
 
-	PanelParams.ElevatorPosition = (5.1 + lift.position.y) / 5.1;
-	//controls.update(); // required if damping enabled
-	switch (lift_do) {
-		case "up":
-			if (((5.1 + lift.position.y) / 5.1) < (stages_count+0.1)) {
-				lift.position.y += 0.02;
-				right_door.position.y += 0.02;
-				left_door.position.y += 0.02;
-				camera.position.y += 0.02;	
-			}
-			else {
-				lift_do = "stop";
-			}			
-			break;
-		case "down":
-			if (lift.position.y > -2.5) {
-				lift.position.y -= 0.02;
-				right_door.position.y -= 0.02;
-				left_door.position.y -= 0.02;
-				camera.position.y -= 0.02;
-			}
-			else
-			{
-				lift_do = "stop";
-			}
-			break;
+	checkStageStatus();
 
-		default:
 
-			break;
-	}
+	liftStateLogic();
 
-	switch (doors_do) {
-		case "open":
-			if (right_door.position.x > 0.7) {
-				doors_do = "opened";
-			}
-			else {
-				left_door.position.x -= 0.01;
-				right_door.position.x += 0.01;
-			}
-
-			break;
-		case "close":
-			if (right_door.position.x < 0.01) {
-
-				doors_do = "closed";
-			}
-			else {
-				left_door.position.x += 0.01;
-				right_door.position.x -= 0.01;
-			}
-			break;
-
-		default:
-
-			break;
-	}
-
-	liftLogic();
+	doorsDoLogic();
+	liftDoLogic();
 
 	render();
 
 }
 
-function liftLogic() {
-	if (current_call_stage != 0) {
+function getCurrentStage() {
+	return Math.round((5.1 + lift.position.y) / 5.1);
+}
+
+
+function getLiftPosition() {
+	return (5.1 + lift.position.y) / 5.1;
+}
+
+function checkStageStatus() {
+	if (Math.abs(Math.round((5.1 + lift.position.y) / 5.1) - ((5.1 + lift.position.y) / 5.1)) < 0.02) {
+		stage_status = true;
+	}
+	else {
 		stage_status = false;
-		if (current_call_stage > (5.1 + lift.position.y) / 5.1) {
-			lift_do = "up";
-			if ((5.12 + lift.position.y) / 5.1 > current_call_stage) {
-				current_call_stage = 0;
-				lift_do = "stop";
-				stage_status = true;
-			}
-		}
-		else {
-			lift_do = "down";
-			if ((5.08 + lift.position.y) / 5.1 < current_call_stage) {
-				current_call_stage = 0;
-				lift_do = "stop";
-				stage_status = true;
-			}
+	}
+}
+
+
+function liftDoLogic() {
+	if (doors_closed) {
+		switch (lift_do) {
+			case "up":
+				if (((5.1 + lift.position.y) / 5.1) < (stages_count + 0.1)) {
+					lift.position.y += 0.02;
+					right_door.position.y += 0.02;
+					left_door.position.y += 0.02;
+					camera.position.y += 0.02;
+				}
+				else {
+					lift_do = "stop";
+				}
+				break;
+			case "down":
+				if (lift.position.y > -2.5) {
+					lift.position.y -= 0.02;
+					right_door.position.y -= 0.02;
+					left_door.position.y -= 0.02;
+					camera.position.y -= 0.02;
+				}
+				else {
+					lift_do = "stop";
+				}
+				break;
+
+			default:
+
+				break;
 		}
 	}
+	PanelParams.ElevatorPosition = (5.1 + lift.position.y) / 5.1;
+}
 
 
+
+function doorsDoLogic() {
+	if (stage_status) {
+		switch (doors_do) {
+			case "open":
+				if (right_door.position.x > 0.7) {
+					doors_do = "opened";
+					doors_closed = false;
+				}
+				else {
+					doors_closed = false;
+					left_door.position.x -= 0.01;
+					right_door.position.x += 0.01;
+				}
+
+				break;
+			case "close":
+				if (right_door.position.x < 0.01) {
+
+					doors_do = "closed";
+					doors_closed = true;
+				}
+				else {
+					doors_closed = false;
+					left_door.position.x += 0.01;
+					right_door.position.x -= 0.01;
+				}
+				break;
+
+			default:
+
+				break;
+		}
+	}
+}
+
+function liftStateLogic() {
+	switch (lift_logic_state) {
+		case "WAIT":
+			console.log('WAIT');
+			if (stages_in_calls.length > 0) {
+				console.log('stages_in_calls.length > 0');				
+				if (stages_in_calls[0] >= getCurrentStage()) {
+					if (stages_in_calls[0] == getCurrentStage() && stage_status) {
+						lift_logic_state = "DO_CURRENT";
+						doors_do = "open";
+					}
+					else {
+						if (stages_in_calls[0] < getLiftPosition()) {
+							lift_logic_state = "DO_DOWN";
+							lift_do = "down";
+						}
+						else {
+							lift_logic_state = "DO_UP";
+							lift_do = "up";
+						}
+
+					}
+				}
+				else {
+					lift_logic_state = "DO_DOWN";
+					lift_do = "down";
+				}
+			}
+			else
+			{
+				if (stages_out_calls.length > 0) {
+					console.log('stages_out_calls.length > 0');
+					if (stages_out_calls[0] >= getCurrentStage()) {
+						if (stages_out_calls[0] == getCurrentStage() && stage_status) {
+							lift_logic_state = "DO_CURRENT";
+							doors_do = "open";							
+						}
+						else {
+							if (stages_out_calls[0] < getLiftPosition()) {
+								lift_logic_state = "DO_DOWN";
+								lift_do = "down";
+							}
+							else {
+								lift_logic_state = "DO_UP";
+								lift_do = "up";
+							}
+	
+						}
+					}
+					else {
+						lift_logic_state = "DO_DOWN";
+						lift_do = "down";
+					}
+				}
+			}
+			break;
+		case "DO_UP":
+			console.log('DO_UP');
+			if (stage_status) {
+				stages_in_calls.forEach(function (item, index, array) {
+					if (item == getCurrentStage()) {
+						lift_logic_state = "DO_UP_STAGE";						
+						lift_do = "stop";
+						doors_do = "open";										
+					};
+				});
+				if (getCurrentStage() == calcMaxStage()) {
+					lift_logic_state = "DO_CURRENT";
+					doors_do = "open";				
+				}
+			}
+			break;
+		case "DO_UP_STAGE":
+			console.log('DO_UP_STAGE');
+			if (doors_do == "opened") {
+				timer_stay_counter++;
+			}
+			if (timer_stay_counter == 100) {
+				doors_do = "close";
+				timer_stay_counter = 0;
+			}
+			if (doors_do == "closed") {
+				if (getCurrentStage() == calcMaxStage()) {
+					lift_logic_state = "WAIT";
+					lift_do = "stop";
+					console.log('max stage');
+					stageFinish(getCurrentStage());
+				}
+				else {
+					lift_do = "up";
+					lift_logic_state = "DO_UP";
+					stageFinish(getCurrentStage());					
+				}
+			}
+			break;
+		case "DO_DOWN":
+			console.log('DO_DOWN');
+			if (stage_status) {
+				var zero = true;
+				stages_in_calls.forEach(function (item, index, array) {
+					if (item == getCurrentStage()) {
+						lift_logic_state = "DO_DOWN_STAGE";						
+						lift_do = "stop";
+						doors_do = "open";	
+						zero = false;								
+					};
+				});
+				if (zero) {
+					stages_out_calls.forEach(function (item, index, array) {
+						if (item == getCurrentStage()) {
+							lift_logic_state = "DO_DOWN_STAGE";						
+							lift_do = "stop";
+							doors_do = "open";																
+						};
+					});
+				}
+				if (getCurrentStage() == calcMinStage()) {
+					lift_logic_state = "DO_CURRENT";
+					doors_do = "open";
+					lift_do = "stop";				
+				}
+			}
+			break;
+		case "DO_DOWN_STAGE":
+				console.log('DO_DOWN_STAGE');
+				if (doors_do == "opened") {
+					timer_stay_counter++;
+				}
+				if (timer_stay_counter == 100) {
+					doors_do = "close";
+					timer_stay_counter = 0;
+				}
+				if (doors_do == "closed") {					
+					console.log('ЗАЛУПА getCurrentStage()'+getCurrentStage()+' Пупа calcMinStage()'+calcMinStage());
+					lift_do = "down";
+					lift_logic_state = "DO_DOWN";
+					stageFinish(getCurrentStage());
+				}
+				break;
+		case "DO_CURRENT":
+			console.log('DO_CURRENT');
+			if (doors_do == "opened") {
+				timer_stay_counter++;
+			}
+			if (timer_stay_counter == 100) {
+				doors_do = "close";
+				timer_stay_counter = 0;
+			}
+			if (doors_do == "closed") {			
+				lift_logic_state = "WAIT";
+				lift_do = "stop";				
+				stageFinish(getCurrentStage());
+			}
+			break;
+		default:
+			console.log('liftStateLogic() ERROR: Default case');
+	}
 }
 
 function panelCallIn(number) {
+
 	var duplicate = false;
 	stages_in_calls.forEach(function (item, index, array) {
 		if (number == item) {
@@ -584,11 +756,10 @@ function panelCallIn(number) {
 	if (!duplicate) {
 		stages_in_calls.push(number);
 	}
-	console.log("Вызовы кабины: "+stages_in_calls)
+	console.log("Вызовы внутри кабины: " + stages_in_calls)
 }
 
 function panelCallOut(number) {
-	current_call_stage = number;
 	var duplicate = false;
 	stages_out_calls.forEach(function (item, index, array) {
 		if (number == item) {
@@ -598,17 +769,82 @@ function panelCallOut(number) {
 	if (!duplicate) {
 		stages_out_calls.push(number);
 	}
+	console.log("Вызовы внешний: " + stages_out_calls)
 }
 
 function panelCallOutCancel() {
-	current_call_stage = 0;
+	console.log('panelCallOutCancel');
+	for (let i = 1; i < stages_count+1; i++) { 		
+		buttons_out_call[i].className = "disable";
+		var myIndex = stages_out_calls.indexOf(i);
+		if (myIndex !== -1) {
+			stages_out_calls.splice(myIndex, 1);
+		}
+	}
+	lift_logic_state = "WAIT";
 	lift_do = "stop";
 }
 
 function panelCallInCancel() {
-	current_call_stage = 0;
+	console.log('panelCallInCancel');
+	for (let i = 1; i < stages_count+1; i++) { 		
+		buttons_in_call[i].className = "disable";
+		var myIndex = stages_in_calls.indexOf(i);
+		if (myIndex !== -1) {
+			stages_in_calls.splice(myIndex, 1);
+		}
+	}
+	lift_logic_state = "WAIT";
 	lift_do = "stop";
 }
+
+function calcMaxStage() {
+	var maxium = 0;
+	stages_out_calls.forEach(function (item, index, array) {
+		if (maxium < item) {
+			maxium = item;
+		};
+	});
+	stages_in_calls.forEach(function (item, index, array) {
+		if (maxium < item) {
+			maxium = item;
+		};
+	});
+
+	return maxium;
+}
+
+function calcMinStage() {
+	var min = 30;
+	stages_out_calls.forEach(function (item, index, array) {
+		if (min > item) {
+			min = item;
+		};
+	});
+	stages_in_calls.forEach(function (item, index, array) {
+		if (min > item) {
+			min = item;
+		};
+	});
+
+	return min;
+}
+
+function stageFinish(stage_number) {
+	console.log('StageFinish('+stage_number+')')
+	buttons_in_call[stage_number].className = "disable";
+	buttons_out_call[stage_number].className = "disable";
+	var myIndex = stages_in_calls.indexOf(stage_number);
+	if (myIndex !== -1) {
+		stages_in_calls.splice(myIndex, 1);
+	}
+	myIndex = stages_out_calls.indexOf(stage_number);
+	if (myIndex !== -1) {
+		stages_out_calls.splice(myIndex, 1);
+	}
+
+}
+
 
 function render() {
 	renderer.render(scene, camera);
