@@ -68,7 +68,7 @@ function init() {
 			const xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
 			geometry.translate( xMid, 0, 0 );
 			const text = new THREE.Mesh( geometry, matLite );
-			text.position.set(3, 5.1 * i - 5.1, 0);
+			text.position.set(3, 5.1 * i, 0);
 			scene.add( text );
 		}
 		
