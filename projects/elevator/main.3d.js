@@ -60,7 +60,7 @@ function init() {
 
 		// make shape ( N.B. edge view not visible )
 		
-		for (let i = 1; i < 30; i++) {	
+		for (let i = 1; i <= 30; i++) {	
 			const message = 'Этаж '+i;
 			const shapes = font.generateShapes( message, 0.5 );
 			const geometry = new THREE.ShapeGeometry( shapes );
