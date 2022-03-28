@@ -3,6 +3,7 @@ import * as THREE from './three.module.js';
 import { GLTFLoader } from './GLTFLoader.js';
 import { RoomEnvironment } from './RoomEnvironment.js';
 import { GUI } from './lil-gui.module.min.js';
+import { FontLoader } from './FontLoader.js';
 
 let camera, scene, renderer;
 let max_stages = 30;
