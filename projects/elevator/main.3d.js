@@ -74,7 +74,7 @@ function init() {
 		// make shape ( N.B. edge view not visible )
 
 		const text = new THREE.Mesh( geometry, matLite );
-		text.position.set(7, 5.1, 0);
+		text.position.set(3.5, 5.1, 0);
 		
 		scene.add( text );
 	} ); //end load function
