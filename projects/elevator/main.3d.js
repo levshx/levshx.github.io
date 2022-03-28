@@ -630,9 +630,9 @@ function doorsDoLogic() {
 function liftStateLogic() {
 	switch (lift_logic_state) {
 		case "WAIT":
-			console.log('WAIT');
+			//console.log('WAIT');
 			if (stages_in_calls.length > 0) {
-				console.log('stages_in_calls.length > 0');				
+				//console.log('stages_in_calls.length > 0');				
 				if (stages_in_calls[0] >= getCurrentStage()) {
 					if (stages_in_calls[0] == getCurrentStage() && stage_status) {
 						lift_logic_state = "DO_CURRENT";
@@ -658,7 +658,7 @@ function liftStateLogic() {
 			else
 			{
 				if (stages_out_calls.length > 0) {
-					console.log('stages_out_calls.length > 0');
+					//console.log('stages_out_calls.length > 0');
 					if (stages_out_calls[0] >= getCurrentStage()) {
 						if (stages_out_calls[0] == getCurrentStage() && stage_status) {
 							lift_logic_state = "DO_CURRENT";
@@ -684,7 +684,7 @@ function liftStateLogic() {
 			}
 			break;
 		case "DO_UP":
-			console.log('DO_UP');
+			//console.log('DO_UP');
 			if (stage_status) {
 				stages_in_calls.forEach(function (item, index, array) {
 					if (item == getCurrentStage()) {
@@ -700,7 +700,7 @@ function liftStateLogic() {
 			}
 			break;
 		case "DO_UP_STAGE":
-			console.log('DO_UP_STAGE');
+			//console.log('DO_UP_STAGE');
 			if (doors_do == "opened") {
 				timer_stay_counter++;
 			}
@@ -712,7 +712,7 @@ function liftStateLogic() {
 				if (getCurrentStage() == calcMaxStage()) {
 					lift_logic_state = "WAIT";
 					lift_do = "stop";
-					console.log('max stage');
+					//console.log('max stage');
 					stageFinish(getCurrentStage());
 				}
 				else {
@@ -723,7 +723,7 @@ function liftStateLogic() {
 			}
 			break;
 		case "DO_DOWN":
-			console.log('DO_DOWN');
+			//console.log('DO_DOWN');
 			if (stage_status) {
 				var zero = true;
 				stages_in_calls.forEach(function (item, index, array) {
@@ -751,7 +751,7 @@ function liftStateLogic() {
 			}
 			break;
 		case "DO_DOWN_STAGE":
-				console.log('DO_DOWN_STAGE');
+				//console.log('DO_DOWN_STAGE');
 				if (doors_do == "opened") {
 					timer_stay_counter++;
 				}
@@ -760,14 +760,14 @@ function liftStateLogic() {
 					timer_stay_counter = 0;
 				}
 				if (doors_do == "closed") {					
-					console.log('ЗАЛУПА getCurrentStage()'+getCurrentStage()+' Пупа calcMinStage()'+calcMinStage());
+					//console.log('ЗАЛУПА getCurrentStage()'+getCurrentStage()+' Пупа calcMinStage()'+calcMinStage());
 					lift_do = "down";
 					lift_logic_state = "DO_DOWN";
 					stageFinish(getCurrentStage());
 				}
 				break;
 		case "DO_CURRENT":
-			console.log('DO_CURRENT');
+			//console.log('DO_CURRENT');
 			if (doors_do == "opened") {
 				timer_stay_counter++;
 			}
