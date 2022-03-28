@@ -59,9 +59,9 @@ function init() {
 			side: THREE.DoubleSide
 		} );
 
-		const message = 'STAGE 1';
+		const message = 'Этаж 1';
 
-		const shapes = font.generateShapes( message, 2 );
+		const shapes = font.generateShapes( message, 0.2 );
 
 		const geometry = new THREE.ShapeGeometry( shapes );
 
@@ -74,7 +74,7 @@ function init() {
 		// make shape ( N.B. edge view not visible )
 
 		const text = new THREE.Mesh( geometry, matLite );
-		text.position.set(0, 5.1, 0);
+		text.position.set(7, 5.1, 0);
 		
 		scene.add( text );
 	} ); //end load function
