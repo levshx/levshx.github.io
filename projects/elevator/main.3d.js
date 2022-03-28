@@ -61,7 +61,7 @@ function init() {
 
 		const message = 'STAGE 1';
 
-		const shapes = font.generateShapes( message, 5 );
+		const shapes = font.generateShapes( message, 50 );
 
 		const geometry = new THREE.ShapeGeometry( shapes );
 
@@ -74,7 +74,8 @@ function init() {
 		// make shape ( N.B. edge view not visible )
 
 		const text = new THREE.Mesh( geometry, matLite );
-		text.position.z = 0;
+		text.position.set(2, 5.1, 2);
+		
 		scene.add( text );
 	} ); //end load function
 	
