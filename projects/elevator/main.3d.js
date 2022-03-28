@@ -70,11 +70,13 @@ function init() {
 		geometry.translate( xMid, 0, 0 );
 
 		// make shape ( N.B. edge view not visible )
-
-		const text = new THREE.Mesh( geometry, matLite );
-		text.position.set(3, 5.1, 0);
 		
-		scene.add( text );
+		for (let i = 1; i < 30; i++) {			
+			const text = new THREE.Mesh( geometry, matLite );
+			text.position.set(3, 5.1 * i - 5.1, 0);
+			scene.add( text );
+		}
+		
 	} ); //end load function
 	
 	
