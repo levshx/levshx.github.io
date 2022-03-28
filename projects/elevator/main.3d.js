@@ -56,22 +56,17 @@ function init() {
 			color: color,						
 			side: THREE.DoubleSide
 		} );
-
-		const message = 'Этаж 1';
-
-		const shapes = font.generateShapes( message, 0.5 );
-
-		const geometry = new THREE.ShapeGeometry( shapes );
-
-		geometry.computeBoundingBox();
-
-		const xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
-
-		geometry.translate( xMid, 0, 0 );
+		
 
 		// make shape ( N.B. edge view not visible )
 		
-		for (let i = 1; i < 30; i++) {			
+		for (let i = 1; i < 30; i++) {	
+			const message = 'Этаж '+i;
+			const shapes = font.generateShapes( message, 0.5 );
+			const geometry = new THREE.ShapeGeometry( shapes );
+			geometry.computeBoundingBox();
+			const xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+			geometry.translate( xMid, 0, 0 );
 			const text = new THREE.Mesh( geometry, matLite );
 			text.position.set(3, 5.1 * i - 5.1, 0);
 			scene.add( text );
