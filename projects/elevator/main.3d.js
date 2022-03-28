@@ -59,9 +59,9 @@ function init() {
 			side: THREE.DoubleSide
 		} );
 
-		const message = '   Этаж\n1';
+		const message = 'STAGE 1';
 
-		const shapes = font.generateShapes( message, 100 );
+		const shapes = font.generateShapes( message, 5 );
 
 		const geometry = new THREE.ShapeGeometry( shapes );
 
