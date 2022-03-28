@@ -43,7 +43,7 @@ function init() {
 
 	//TEXT
 	const loader = new FontLoader();
-	loader.load( 'Monospace.font.json', function ( font ) {
+	loader.load( 'OpenSans.facetype.json', function ( font ) {
 
 		const color = 0x006699;
 
