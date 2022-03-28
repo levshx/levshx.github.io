@@ -45,7 +45,7 @@ function init() {
 	const loader = new FontLoader();
 	loader.load( 'OpenSans.facetype.json', function ( font ) {
 
-		const color = 0x006699;
+		const color = 0xefba5d;
 
 		const matDark = new THREE.LineBasicMaterial( {
 			color: color,
@@ -61,7 +61,7 @@ function init() {
 
 		const message = 'Этаж 1';
 
-		const shapes = font.generateShapes( message, 0.2 );
+		const shapes = font.generateShapes( message, 0.5 );
 
 		const geometry = new THREE.ShapeGeometry( shapes );
 
