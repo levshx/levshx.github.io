@@ -53,9 +53,7 @@ function init() {
 		} );
 
 		const matLite = new THREE.MeshBasicMaterial( {
-			color: color,
-			transparent: true,
-			opacity: 0.4,
+			color: color,						
 			side: THREE.DoubleSide
 		} );
 
