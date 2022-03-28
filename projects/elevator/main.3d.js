@@ -43,7 +43,7 @@ function init() {
 
 	//TEXT
 	const loader = new FontLoader();
-	loader.load( 'helvetiker_regular.typeface.json', function ( font ) {
+	loader.load( 'Monospace', function ( font ) {
 
 		const color = 0x006699;
 
