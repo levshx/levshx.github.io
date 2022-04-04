@@ -632,6 +632,7 @@ function liftStateLogic() {
 					if (stages_in_calls[0] == getCurrentStage() && stage_status) {
 						lift_logic_state = "DO_CURRENT";
 						doors_do = "open";
+						stageStop(getCurrentStage());
 					}
 					else {
 						if (stages_in_calls[0] < getLiftPosition()) {
@@ -657,7 +658,8 @@ function liftStateLogic() {
 					if (stages_out_calls[0] >= getCurrentStage()) {
 						if (stages_out_calls[0] == getCurrentStage() && stage_status) {
 							lift_logic_state = "DO_CURRENT";
-							doors_do = "open";							
+							doors_do = "open";	
+							stageStop(getCurrentStage());						
 						}
 						else {
 							if (stages_out_calls[0] < getLiftPosition()) {
@@ -681,16 +683,22 @@ function liftStateLogic() {
 		case "DO_UP":
 			//console.log('DO_UP');
 			if (stage_status) {
-				stages_in_calls.forEach(function (item, index, array) {
+				var stopZero = false;
+				stages_in_calls.forEach(function (item, index, array) {					
 					if (item == getCurrentStage()) {
 						lift_logic_state = "DO_UP_STAGE";						
 						lift_do = "stop";
-						doors_do = "open";										
+						doors_do = "open";	
+						stopZero = true;								
 					};
 				});
 				if (getCurrentStage() == calcMaxStage()) {
 					lift_logic_state = "DO_CURRENT";
-					doors_do = "open";				
+					doors_do = "open";
+					stopZero = true;				
+				}
+				if (stopZero) {
+					stageStop(getCurrentStage());
 				}
 			}
 			break;
@@ -721,12 +729,14 @@ function liftStateLogic() {
 			//console.log('DO_DOWN');
 			if (stage_status) {
 				var zero = true;
+				var stopZero = false;
 				stages_in_calls.forEach(function (item, index, array) {
 					if (item == getCurrentStage()) {
 						lift_logic_state = "DO_DOWN_STAGE";						
 						lift_do = "stop";
 						doors_do = "open";	
-						zero = false;								
+						zero = false;
+						stopZero = true;								
 					};
 				});
 				if (zero) {
@@ -734,14 +744,19 @@ function liftStateLogic() {
 						if (item == getCurrentStage()) {
 							lift_logic_state = "DO_DOWN_STAGE";						
 							lift_do = "stop";
-							doors_do = "open";																
+							doors_do = "open";	
+							stopZero = true;															
 						};
 					});
 				}
 				if (getCurrentStage() == calcMinStage()) {
 					lift_logic_state = "DO_CURRENT";
 					doors_do = "open";
-					lift_do = "stop";				
+					lift_do = "stop";
+					stopZero = true;				
+				}
+				if (stopZero) {
+					stageStop(getCurrentStage());
 				}
 			}
 			break;
@@ -754,8 +769,7 @@ function liftStateLogic() {
 					doors_do = "close";
 					timer_stay_counter = 0;
 				}
-				if (doors_do == "closed") {					
-					//console.log('ЗАЛУПА getCurrentStage()'+getCurrentStage()+' Пупа calcMinStage()'+calcMinStage());
+				if (doors_do == "closed") {			
 					lift_do = "down";
 					lift_logic_state = "DO_DOWN";
 					stageFinish(getCurrentStage());
@@ -879,6 +893,11 @@ function stageFinish(stage_number) {
 		stages_out_calls.splice(myIndex, 1);
 	}
 
+}
+
+function stageStop(stage_number) {
+	console.log('stageStop('+stage_number+')')
+	eel.stageStop(stage_number)
 }
 
 
