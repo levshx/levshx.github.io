@@ -1,4 +1,3 @@
-
 import * as THREE from './three.module.js';
 import { GLTFLoader } from './GLTFLoader.js';
 import { RoomEnvironment } from './RoomEnvironment.js';
@@ -8,10 +7,10 @@ import { FontLoader } from './FontLoader.js';
 let camera, scene, renderer;
 let max_stages = 30;
 var stages_count = 10;
-var lift, left_door, right_door, stages, lift_do = "stop", doors_do = "closed", doors_closed = true, stage_status = true, lift_logic_state = "WAIT";
+var lift, left_door, right_door, stages = [], lift_do = "stop", doors_do = "closed", doors_closed = true, stage_status = true, lift_logic_state = "WAIT";
 var COMPORTs = {};
 var ComboBoxCOM;
-var stop_stage = 0;
+var loaded_status = false, loading_status = "Loading", loadlabel;
 
 
 
@@ -23,14 +22,47 @@ var buttons_out_call = [];
 var buttons_in_call = [];
 var buttons_panel, cancel_out_button, cancel_in_button, close_in_button, open_in_button;
 var PanelParams;
+
 init();
-animate();
+loading();
 
 function init() {
 
+	// LOADING
+
+	const manager = new THREE.LoadingManager();
+	const loadergltf = new GLTFLoader(manager);
+
+	manager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+		loading_status = 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.';
+		console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+	
+	};
+	
+	manager.onLoad = function ( ) {
+		loaded_status = true;
+		console.log( 'Loading complete!');	
+	};
+	
+	
+	manager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+		loading_status = 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.';
+		console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+	
+	};
+	
+	manager.onError = function ( url ) {
+		loading_status = 'There was an error loading ' + url;
+		console.log( 'There was an error loading ' + url );
+	
+	};
+	
+
+	// INIT
 
 	const container = document.createElement('div');
 	document.body.appendChild(container);
+	loadlabel = document.getElementById('loadlabel');
 
 	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 30);
 	camera.position.set(5, 5.1, 10);
@@ -41,9 +73,11 @@ function init() {
 	const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
 	scene.add(directionalLight);
 
+	
+
 	//TEXT
-	const loader = new FontLoader();
-	loader.load( 'OpenSans.facetype.json', function ( font ) {
+	const fontloader = new FontLoader();
+	fontloader.load( 'OpenSans.facetype.json', function ( font ) {
 
 		const color = 0xefba5d;
 
@@ -78,7 +112,7 @@ function init() {
 	
 	// model
 
-	new GLTFLoader().load('bot.gltf', function (gltf) {
+	loadergltf.load('bot.gltf', function (gltf) {
 
 		var bot = gltf.scene;
 		scene.add(bot);
@@ -86,229 +120,33 @@ function init() {
 
 	});
 
-	new GLTFLoader().load('lift.gltf', function (gltf) {
+	loadergltf.load('lift.gltf', function (gltf) {
 
 		lift = gltf.scene;
+		lift.position.y = 0;
 		scene.add(lift);
 	});
 
-	// 1
-	new GLTFLoader().load('stage.gltf', function (gltf) {
+	// STAGES
+	loadergltf.load('stage.gltf', function (gltf) {
 
-		stages = gltf.scene;
-		scene.add(stages);
-	});
-	//2
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 2 - 5.1;
-		scene.add(stages);
-	});
-	//3
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 3 - 5.1;
-		scene.add(stages);
-	});
-	//4
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 4 - 5.1;
-		scene.add(stages);
-	});
-	//5
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 5 - 5.1;
-		scene.add(stages);
-	});
-	//6
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 6 - 5.1;
-		scene.add(stages);
-	});
-	//7
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 7 - 5.1;
-		scene.add(stages);
-	});
-	//8
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 8 - 5.1;
-		scene.add(stages);
-	});
-	//9
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 9 - 5.1;
-		scene.add(stages);
-	});
-	//10
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 10 - 5.1;
-		scene.add(stages);
-	});
-	//11
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 11 - 5.1;
-		scene.add(stages);
-	});
-	//12
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 12 - 5.1;
-		scene.add(stages);
-	});
-	//13
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 13 - 5.1;
-		scene.add(stages);
-	});
-	//14
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 14 - 5.1;
-		scene.add(stages);
-	});
-	//15
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 15 - 5.1;
-		scene.add(stages);
-	});
-	//16
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 16 - 5.1;
-		scene.add(stages);
-	});
-	//17
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 17 - 5.1;
-		scene.add(stages);
-	});
-	//18
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 18 - 5.1;
-		scene.add(stages);
-	});
-	//19
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 19 - 5.1;
-		scene.add(stages);
-	});
-	//20
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 20 - 5.1;
-		scene.add(stages);
-	});
-	//21
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 21 - 5.1;
-		scene.add(stages);
-	});
-	//22
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 22 - 5.1;
-		scene.add(stages);
-	});
-	//23
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 23 - 5.1;
-		scene.add(stages);
-	});
-	//24
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 24 - 5.1;
-		scene.add(stages);
-	});
-	//25
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 25 - 5.1;
-		scene.add(stages);
-	});
-	//26
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 26 - 5.1;
-		scene.add(stages);
-	});
-	//27
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 27 - 5.1;
-		scene.add(stages);
-	});
-	//28
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 28 - 5.1;
-		scene.add(stages);
-	});
-	//29
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 29 - 5.1;
-		scene.add(stages);
-	});
-	//30
-	new GLTFLoader().load('stage.gltf', function (gltf) {
-
-		stages = gltf.scene;
-		stages.position.y += 5.1 * 30 - 5.1;
-		scene.add(stages);
+		const model = new THREE.Object3D( );
+		model.add(gltf.scene);
+		for (var i = 1; i < 31; i++) {
+			let modelClone = model.clone();	
+			modelClone.position.y = 5.1 * i - 5.1;
+			stages.push(modelClone);
+			scene.add(modelClone);
+		}		
 	});
 
-	new GLTFLoader().load('right_door.gltf', function (gltf) {
+	loadergltf.load('right_door.gltf', function (gltf) {
 
 		right_door = gltf.scene;
 		scene.add(right_door);
 	});
 
-	new GLTFLoader().load('left_door.gltf', function (gltf) {
+	loadergltf.load('left_door.gltf', function (gltf) {
 
 		left_door = gltf.scene;
 		scene.add(left_door);
@@ -330,6 +168,7 @@ function init() {
 	scene.environment = pmremGenerator.fromScene(environment).texture;
 
 	window.addEventListener('resize', onWindowResize);
+
 
 	createPanel();
 	createCallPanel();
@@ -516,6 +355,17 @@ function onWindowResize() {
 
 //
 
+function loading() {
+	if (loaded_status) {
+		requestAnimationFrame(animate);
+		loadlabel.remove();		
+	}
+	else {
+		requestAnimationFrame(loading);
+	}
+	loadlabel.innerHTML = loading_status;
+}
+
 function animate() {
 
 	requestAnimationFrame(animate);
@@ -576,9 +426,7 @@ function liftDoLogic() {
 					lift_do = "stop";
 				}
 				break;
-
 			default:
-
 				break;
 		}
 	}
@@ -604,7 +452,6 @@ function doorsDoLogic() {
 				break;
 			case "close":
 				if (right_door.position.x < 0.01) {
-
 					doors_do = "closed";
 					doors_closed = true;
 				}
@@ -624,10 +471,8 @@ function doorsDoLogic() {
 
 function liftStateLogic() {
 	switch (lift_logic_state) {
-		case "WAIT":
-			//console.log('WAIT');
-			if (stages_in_calls.length > 0) {
-				//console.log('stages_in_calls.length > 0');				
+		case "WAIT":		
+			if (stages_in_calls.length > 0) {								
 				if (stages_in_calls[0] >= getCurrentStage()) {
 					if (stages_in_calls[0] == getCurrentStage() && stage_status) {
 						lift_logic_state = "DO_CURRENT";
@@ -653,8 +498,7 @@ function liftStateLogic() {
 			}
 			else
 			{
-				if (stages_out_calls.length > 0) {
-					//console.log('stages_out_calls.length > 0');
+				if (stages_out_calls.length > 0) {				
 					if (stages_out_calls[0] >= getCurrentStage()) {
 						if (stages_out_calls[0] == getCurrentStage() && stage_status) {
 							lift_logic_state = "DO_CURRENT";
@@ -680,8 +524,7 @@ function liftStateLogic() {
 				}
 			}
 			break;
-		case "DO_UP":
-			//console.log('DO_UP');
+		case "DO_UP":		
 			if (stage_status) {
 				var stopZero = false;
 				stages_in_calls.forEach(function (item, index, array) {					
@@ -702,8 +545,7 @@ function liftStateLogic() {
 				}
 			}
 			break;
-		case "DO_UP_STAGE":
-			//console.log('DO_UP_STAGE');
+		case "DO_UP_STAGE":			
 			if (doors_do == "opened") {
 				timer_stay_counter++;
 			}
@@ -714,8 +556,7 @@ function liftStateLogic() {
 			if (doors_do == "closed") {
 				if (getCurrentStage() == calcMaxStage()) {
 					lift_logic_state = "WAIT";
-					lift_do = "stop";
-					//console.log('max stage');
+					lift_do = "stop";				
 					stageFinish(getCurrentStage());
 				}
 				else {
@@ -726,7 +567,6 @@ function liftStateLogic() {
 			}
 			break;
 		case "DO_DOWN":
-			//console.log('DO_DOWN');
 			if (stage_status) {
 				var zero = true;
 				var stopZero = false;
@@ -760,8 +600,7 @@ function liftStateLogic() {
 				}
 			}
 			break;
-		case "DO_DOWN_STAGE":
-				//console.log('DO_DOWN_STAGE');
+		case "DO_DOWN_STAGE":				
 				if (doors_do == "opened") {
 					timer_stay_counter++;
 				}
@@ -775,8 +614,7 @@ function liftStateLogic() {
 					stageFinish(getCurrentStage());
 				}
 				break;
-		case "DO_CURRENT":
-			//console.log('DO_CURRENT');
+		case "DO_CURRENT":			
 			if (doors_do == "opened") {
 				timer_stay_counter++;
 			}
